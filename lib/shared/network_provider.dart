@@ -18,8 +18,8 @@ Dio dio(Ref ref) {
     headers: {
       "Content-Type": "application/json",
     },
-    connectTimeout: const Duration(seconds: 60),
-    receiveTimeout: const Duration(seconds: 60),
+    connectTimeout: const Duration(seconds: 500),
+    receiveTimeout: const Duration(seconds: 500),
   );
   return Dio(options);
 }
