@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'home_model.freezed.dart';
-
 part 'home_model.g.dart';
 
 @freezed
@@ -28,6 +27,7 @@ class HomeItemModel with _$HomeItemModel {
     String? owner,
     int? price,
     String? thumbnail,
+    String? count,
     String? deadline,
     String? description,
     int? waitlistCount,

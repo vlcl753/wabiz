@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'network_provider.g.dart';
-@riverpod
-Dio dio (Ref ref) {
+@Riverpod(keepAlive: true)
+Dio dio(Ref ref) {
   var localhost = "localhost";
 
   if (defaultTargetPlatform == TargetPlatform.android) {
@@ -13,13 +13,13 @@ Dio dio (Ref ref) {
   }
 
   final options = BaseOptions(
-    baseUrl: "http//$localhost:3000/api/v1",
+    baseUrl: "http://$localhost:3000/api/v1",
     responseType: ResponseType.json,
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    connectTimeout: const Duration(seconds: 30),
-    receiveTimeout: const Duration(seconds: 30)
+    connectTimeout: const Duration(seconds: 60),
+    receiveTimeout: const Duration(seconds: 60),
   );
   return Dio(options);
 }

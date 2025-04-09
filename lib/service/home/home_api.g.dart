@@ -24,7 +24,7 @@ class _HomeApi implements HomeApi {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HomeModel> getHomeProject() async {
+  Future<HomeModel> getHomeProjects() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
