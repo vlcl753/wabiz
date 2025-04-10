@@ -17,6 +17,13 @@ class WabizAppShell extends ConsumerStatefulWidget {
 }
 
 class _WabizAppShellState extends ConsumerState<WabizAppShell> {
+  void _onItemTapped(int index, BuildContext context) {
+    if (index == 3) {
+      GoRouter.of(context).go("/my");
+    } else {
+      GoRouter.of(context).go("/home");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +31,7 @@ class _WabizAppShellState extends ConsumerState<WabizAppShell> {
       body: widget.child,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: widget.currentIndex,
+        onTap: (int idx) => _onItemTapped(idx, context),
         items: [
           const BottomNavigationBarItem(
             icon: Icon(

@@ -16,3 +16,5 @@ abstract class CategoryApiClient {
   Future<CategoryModel> getProjectsByProjectsType(
       @Path() String? categoryId, @Path() String? projectTypeId);
 }
+
+
