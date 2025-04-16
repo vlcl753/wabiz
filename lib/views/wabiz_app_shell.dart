@@ -1,3 +1,4 @@
+import 'package:fastcampus_wabiz_client/view_model/login/login_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -18,7 +19,21 @@ class WabizAppShell extends ConsumerStatefulWidget {
 
 class _WabizAppShellState extends ConsumerState<WabizAppShell> {
   void _onItemTapped(int index, BuildContext context) {
-    if (index == 3) {
+    if (index == 1) {
+      if (ref.read(loginViewModelProvider).isLogin) {
+        GoRouter.of(context).push("/add");
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => const AlertDialog(
+            content: Text("로그인이 필요한 서비스입니다."),
+          ),
+        );
+        return;
+      }
+    } else if (index == 2) {
+      GoRouter.of(context).go("/favorite");
+    } else if (index == 3) {
       GoRouter.of(context).go("/my");
     } else {
       GoRouter.of(context).go("/home");

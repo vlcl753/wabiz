@@ -77,13 +77,13 @@ class _MyPageState extends State<MyPage> {
                                     showDialog(
                                       context: context,
                                       builder: (context) => AlertDialog(
-                                        content: Text("로그아웃 할까요?"),
+                                        content: const Text("로그아웃 할까요?"),
                                         actions: [
                                           TextButton(
                                             onPressed: () {
                                               context.pop();
                                             },
-                                            child: Text("취소"),
+                                            child: const Text("취소"),
                                           ),
                                           TextButton(
                                             onPressed: () {
@@ -93,14 +93,14 @@ class _MyPageState extends State<MyPage> {
                                                   .signOut();
                                               context.pop();
                                             },
-                                            child: Text("확인"),
+                                            child: const Text("확인"),
                                           ),
                                         ],
                                       ),
                                     );
                                   },
                                   tooltip: "로그아웃",
-                                  icon: Icon(Icons.logout),
+                                  icon: const Icon(Icons.logout),
                                 ),
                               ],
                             );
@@ -168,11 +168,12 @@ class _MyPageState extends State<MyPage> {
                       ),
                       InkWell(
                         onTap: () {
+                          context.push("/add");
                           if (!(myPageState.loginState ?? true)) {
                             showDialog(
                               context: context,
-                              builder: (context) => AlertDialog(
-                                content: Text("로그인이 핋요한 서비스입니다."),
+                              builder: (context) => const AlertDialog(
+                                content: Text("로그인이 필요한 서비스입니다."),
                               ),
                             );
                             return;

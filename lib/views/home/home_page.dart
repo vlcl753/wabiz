@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fastcampus_wabiz_client/view_model/home/home_view_model.dart';
 import 'package:flutter/material.dart';
@@ -153,7 +155,14 @@ class _HomePageState extends State<HomePage> {
                         itemBuilder: (context, index) {
                           final project = data.projects[index];
                           return InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              context.push(
+                                "/detail",
+                                extra: json.encode(
+                                  project.toJson(),
+                                ),
+                              );
+                            },
                             child: Container(
                               margin: const EdgeInsets.only(
                                   bottom: 8, right: 16, left: 16, top: 20),

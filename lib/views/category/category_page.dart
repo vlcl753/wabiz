@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -7,8 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
+
+import '../../view_model/favorite/favorite_view_model.dart';
 
 class CategoryPage extends ConsumerStatefulWidget {
   const CategoryPage({super.key, required this.categoryId});
@@ -19,17 +23,19 @@ class CategoryPage extends ConsumerStatefulWidget {
   ConsumerState<CategoryPage> createState() => _CategoryPageState();
 }
 
-
 class _CategoryPageState extends ConsumerState<CategoryPage> {
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback(( _) {
-      ref.read(categoryViewModelProvider.notifier).fetchProjects(widget.categoryId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(categoryViewModelProvider.notifier)
+          .fetchProjects(widget.categoryId);
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,7 +149,9 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                                 ref
                                     .read(categoryViewModelProvider.notifier)
                                     .updateType(tab);
-                                ref.read(categoryViewModelProvider.notifier).fetchProjects(widget.categoryId);
+                                ref
+                                    .read(categoryViewModelProvider.notifier)
+                                    .fetchProjects(widget.categoryId);
                                 print(vm.selectedType);
                                 print(tab.type);
                               },
@@ -203,10 +211,11 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Consumer(
               builder: (BuildContext context, ref, Widget? child) {
-                final projects = ref.watch(categoryViewModelProvider).projectState;
+                final projects =
+                    ref.watch(categoryViewModelProvider).projectState;
                 return projects.when(
                   data: (data) {
-                    if(data.isEmpty) {
+                    if (data.isEmpty) {
                       return Center(child: "등록된 프로젝트가 없습니다.".text.make());
                     }
                     return Column(
@@ -233,13 +242,13 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                                 return DropdownButton(
                                   value: filter,
                                   items:
-                                  EnumCategoryProjectType.values.map((e) {
+                                      EnumCategoryProjectType.values.map((e) {
                                     return DropdownMenuItem(
                                       value: e,
                                       onTap: () {
                                         ref
                                             .read(categoryViewModelProvider
-                                            .notifier)
+                                                .notifier)
                                             .updateProjectFilter(e);
                                       },
                                       child: Text("${e.value}"),
@@ -263,14 +272,22 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                               return Padding(
                                 padding: EdgeInsets.only(bottom: 25),
                                 child: InkWell(
-                                  onTap: () {},
+                                  onTap: () {
+                                    context.push(
+                                      "/detail",
+                                      extra: json.encode(
+                                        project.toJson(),
+                                      ),
+                                    );
+                                  },
                                   child: Row(
                                     children: [
                                       Container(
                                         height: 120,
                                         width: 164,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                           color: Colors.black.withOpacity(.2),
                                           image: DecorationImage(
                                             image: CachedNetworkImageProvider(
@@ -286,10 +303,62 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                                             Positioned(
                                               right: 2,
                                               top: 2,
-                                              child: IconButton(
-                                                onPressed: () {},
-                                                icon: const Icon(
-                                                    Icons.favorite_border),
+                                              child: Consumer(
+                                                builder: (BuildContext context,
+                                                    WidgetRef ref,
+                                                    Widget? child) {
+                                                  final favorites = ref.watch(
+                                                      favoriteViewModelProvider);
+                                                  final current = favorites
+                                                      .projects
+                                                      .where((element) =>
+                                                          element.id ==
+                                                          project.id)
+                                                      .toList();
+                                                  return IconButton(
+                                                    onPressed: () {
+                                                      if (current.isNotEmpty) {
+                                                        showDialog(
+                                                            context: context,
+                                                            builder: (context) {
+                                                              return AlertDialog(
+                                                                content: Text(
+                                                                    "구독을 취소할까요?"),
+                                                                actions: [
+                                                                  TextButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      ref
+                                                                          .read(favoriteViewModelProvider
+                                                                              .notifier)
+                                                                          .removeItem(
+                                                                              project);
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop();
+                                                                    },
+                                                                    child: Text(
+                                                                        "네"),
+                                                                  )
+                                                                ],
+                                                              );
+                                                            });
+                                                        return;
+                                                      }
+                                                      ref
+                                                          .read(
+                                                              favoriteViewModelProvider
+                                                                  .notifier)
+                                                          .addItem(project);
+                                                    },
+                                                    icon: Icon(current.isEmpty
+                                                        ? Icons.favorite_border
+                                                        : Icons.favorite),
+                                                    color: current.isNotEmpty
+                                                        ? Colors.red
+                                                        : Colors.white,
+                                                  );
+                                                },
                                               ),
                                             ),
                                           ],
@@ -327,7 +396,8 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                                                     Radius.circular(3)),
                                                 color: AppColors.bg),
                                             child: Text(
-                                              switch (project.totalFunded ?? 0) {
+                                              switch (
+                                                  project.totalFunded ?? 0) {
                                                 >= 100000000 && > 10000000 =>
                                                   "${NumberFormat.currency(
                                                     locale: "ko_KR",
