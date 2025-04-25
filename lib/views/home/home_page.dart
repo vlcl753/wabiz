@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:fastcampus_wabiz_client/view_model/home/home_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +9,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../domain/use_cases/home/fetch_home_projects.dart';
 import '../../theme.dart';
 
 class HomePage extends StatefulWidget {
@@ -259,4 +261,17 @@ class _HomePageState extends State<HomePage> {
       )),
     );
   }
+}
+sealed class ErrorHandler {}
+
+class ConnectionTimeoutError extends ErrorHandler {
+  DioException exception;
+
+  ConnectionTimeoutError(this.exception);
+}
+
+class ConnectionError extends ErrorHandler {
+  DioException exception;
+
+  ConnectionError(this.exception);
 }
