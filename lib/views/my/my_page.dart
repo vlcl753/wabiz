@@ -7,6 +7,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../model/project/project_model.dart';
+
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
 
@@ -139,32 +141,185 @@ class _MyPageState extends State<MyPage> {
                           }
                         },
                       ),
-                      Column(
-                        children: [
-                          CircleAvatar(
-                            radius: 28,
-                            backgroundColor: AppColors.wabizGray[200],
-                            child: SvgPicture.asset(
-                              "assets/icons/featured_seasonal_and_gifts.svg",
-                              width: 28,
-                              height: 28,
-                              colorFilter: const ColorFilter.mode(
-                                  Colors.white, BlendMode.srcIn),
-                            ),
-                          ),
-                          const Gap(20),
-                          const Text(
-                            "새로운 도전을\n시작해보세요",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 13),
-                          ),
-                          const Gap(20),
-                          const Text(
-                            "개인 후원부터 제품, 콘텐츠, 서비스 출시, 성장까지 함께할게요.",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400, fontSize: 12),
-                          ),
-                        ],
+                      Consumer(
+                        builder: (BuildContext context, WidgetRef ref,
+                            Widget? child) {
+                          final isLogin =
+                              ref.watch(myPageViewModelProvider).loginState ??
+                                  false;
+                          if (!isLogin) {
+                            return const _EmptyProjectWidget();
+                          }
+                          return FutureBuilder(
+                            future: ref
+                                .watch(myPageViewModelProvider.notifier)
+                                .fetchUserProjects(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                List<ProjectItemModel> lists =
+                                    snapshot.data ?? [];
+                                if (lists.isEmpty) {
+                                  return const _EmptyProjectWidget();
+                                }
+                                return Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Gap(24),
+                                      const Text("나의 프로젝트"),
+                                      Expanded(
+                                        child: ListView.builder(
+                                          itemCount: lists.length,
+                                          itemBuilder: (context, index) {
+                                            final project = lists[index];
+                                            return ListTile(
+                                              title: Text("${project.title}"),
+                                              subtitle: Text(
+                                                "${project.description}",
+                                                maxLines: 2,
+                                              ),
+                                              leading: Text("${project.type}"),
+                                              trailing: PopupMenuButton(
+                                                itemBuilder: (context) {
+                                                  return [
+                                                    PopupMenuItem(
+                                                      onTap: () {
+                                                        context.push(
+                                                            "/add/reward/${project.id}");
+                                                      },
+                                                      child:
+                                                          const Text("리워드 추가"),
+                                                    ),
+                                                    PopupMenuItem(
+                                                      onTap: () {
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (context) {
+                                                            bool openState =
+                                                                project.isOpen ==
+                                                                        "open"
+                                                                    ? true
+                                                                    : false;
+                                                            return StatefulBuilder(
+                                                              builder: (context,
+                                                                  setState) {
+                                                                return AlertDialog(
+                                                                  title: Text(
+                                                                      "프로젝트 수정"),
+                                                                  content:
+                                                                      Column(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .min,
+                                                                    children: [
+                                                                      SwitchListTile
+                                                                          .adaptive(
+                                                                        title: Text(
+                                                                            "오픈상태"),
+                                                                        value:
+                                                                            openState,
+                                                                        onChanged:
+                                                                            (value) {
+                                                                          setState(
+                                                                            () {
+                                                                              openState = value;
+                                                                            },
+                                                                          );
+                                                                        },
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  actions: [
+                                                                    TextButton(
+                                                                      onPressed:
+                                                                          () async {
+                                                                        final result = await ref
+                                                                            .read(myPageViewModelProvider.notifier)
+                                                                            .updateProjectOpenState(
+                                                                              project.id.toString(),
+                                                                              ProjectItemModel(isOpen: openState ? "opne" : "close"),
+                                                                            );
+                                                                        if (result) {
+                                                                          if (context
+                                                                              .mounted) {
+                                                                            Navigator.of(context).pop();
+                                                                          }
+                                                                        }
+                                                                      },
+                                                                      child: Text(
+                                                                          "저장"),
+                                                                    ),
+                                                                  ],
+                                                                );
+                                                              },
+                                                            );
+                                                          },
+                                                        );
+                                                      },
+                                                      child:
+                                                          Text("프로젝트 오픈상태 수정"),
+                                                    ),
+                                                    PopupMenuItem(
+                                                      child: Text("프로젝트 삭제"),
+                                                      onTap: () async {
+                                                        showDialog(
+                                                            context: context,
+                                                            builder: (context) {
+                                                              return AlertDialog(
+                                                                content: Text(
+                                                                    "삭제하시겠습니까?"),
+                                                                actions: [
+                                                                  TextButton(
+                                                                    onPressed:
+                                                                        () async {
+                                                                      final result = await ref
+                                                                          .read(
+                                                                              myPageViewModelProvider.notifier)
+                                                                          .deleteProject(
+                                                                            project.id.toString(),
+                                                                          );
+                                                                      if (result) {
+                                                                        if (context
+                                                                            .mounted) {
+                                                                          Navigator.of(context)
+                                                                              .pop();
+                                                                          setState(
+                                                                            () {},
+                                                                          );
+                                                                        }
+                                                                      }
+                                                                    },
+                                                                    child: Text(
+                                                                        "네"),
+                                                                  ),
+                                                                ],
+                                                              );
+                                                            });
+                                                      },
+                                                    ),
+                                                  ];
+                                                },
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                              if (snapshot.hasError) {
+                                return Center(
+                                  child: Text("${snapshot.error}"),
+                                );
+                              }
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            },
+                          );
+                        },
                       ),
                       InkWell(
                         onTap: () {
@@ -204,6 +359,38 @@ class _MyPageState extends State<MyPage> {
           },
         ),
       ),
+    );
+  }
+}
+
+class _EmptyProjectWidget extends StatelessWidget {
+  const _EmptyProjectWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 28,
+          backgroundColor: AppColors.wabizGray[200],
+          child: SvgPicture.asset(
+            "assets/icons/featured_seasonal_and_gifts.svg",
+            width: 28,
+            height: 28,
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          ),
+        ),
+        const Gap(20),
+        const Text(
+          "새로운 도전을\n시작해보세요",
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+        ),
+        const Gap(20),
+        const Text(
+          "개인 후원부터 제품, 콘텐츠, 서비스 출시, 성장까지 함께할게요.",
+          style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
+        ),
+      ],
     );
   }
 }

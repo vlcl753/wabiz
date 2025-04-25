@@ -27,7 +27,6 @@ class CategoryItemModel with _$CategoryItemModel {
     String? owner,
     int? price,
     String? thumbnail,
-    String? count,
     String? deadline,
     String? description,
     int? waitlistCount,
@@ -35,7 +34,7 @@ class CategoryItemModel with _$CategoryItemModel {
     int? totalFunded,
     String? isOpen,
     String? category,
-    String? projectType,
+    String? type,
     @Default([]) List<int> image,
   }) = _CategoryItemModel;
 

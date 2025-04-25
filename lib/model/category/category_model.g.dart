@@ -35,7 +35,6 @@ _$CategoryItemModelImpl _$$CategoryItemModelImplFromJson(
       owner: json['owner'] as String?,
       price: (json['price'] as num?)?.toInt(),
       thumbnail: json['thumbnail'] as String?,
-      count: json['count'] as String?,
       deadline: json['deadline'] as String?,
       description: json['description'] as String?,
       waitlistCount: (json['waitlist_count'] as num?)?.toInt(),
@@ -43,7 +42,7 @@ _$CategoryItemModelImpl _$$CategoryItemModelImplFromJson(
       totalFunded: (json['total_funded'] as num?)?.toInt(),
       isOpen: json['is_open'] as String?,
       category: json['category'] as String?,
-      projectType: json['project_type'] as String?,
+      type: json['type'] as String?,
       image: (json['image'] as List<dynamic>?)
               ?.map((e) => (e as num).toInt())
               .toList() ??
@@ -61,7 +60,6 @@ Map<String, dynamic> _$$CategoryItemModelImplToJson(
       'owner': instance.owner,
       'price': instance.price,
       'thumbnail': instance.thumbnail,
-      'count': instance.count,
       'deadline': instance.deadline,
       'description': instance.description,
       'waitlist_count': instance.waitlistCount,
@@ -69,6 +67,6 @@ Map<String, dynamic> _$$CategoryItemModelImplToJson(
       'total_funded': instance.totalFunded,
       'is_open': instance.isOpen,
       'category': instance.category,
-      'project_type': instance.projectType,
+      'type': instance.type,
       'image': instance.image,
     };

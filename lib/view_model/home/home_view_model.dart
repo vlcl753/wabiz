@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:fastcampus_wabiz_client/model/home/home_model.dart';
 import 'package:fastcampus_wabiz_client/repository/home/home_repository.dart';
+import 'package:fastcampus_wabiz_client/views/home/home_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -8,6 +10,7 @@ import '../../shared/model/category.dart';
 
 part 'home_view_model.freezed.dart';
 part 'home_view_model.g.dart';
+
 
 @freezed
 class HomeState with _$HomeState {
@@ -18,6 +21,9 @@ class HomeState with _$HomeState {
   factory HomeState.fromJson(Map<String, dynamic> json) =>
       _$HomeStateFromJson(json);
 }
+
+
+
 
 @riverpod
 class HomeViewModel extends _$HomeViewModel {
@@ -42,16 +48,27 @@ class HomeViewModel extends _$HomeViewModel {
   }
 }
 
+
+///홈 화면에 보여지는 프로젝트 리스트를 가져오는 provider
 @riverpod
 Future<HomeModel> fetchHomeProject(Ref ref) async {
   try {
     final result =
         await ref.watch(homeViewModelProvider.notifier).fetchHomeData();
     return result ?? const HomeModel();
-  } catch (e) {
+  } on DioException catch (error) {
+    switch (error.type) {
+      case DioExceptionType.connectionTimeout:
+        throw ConnectionTimeoutError(error);
+      case DioExceptionType.connectionError:
+        throw ConnectionError(error);
+        default:
+    }
     return const HomeModel();
   }
 }
+
+///홈 화면에 보여지는 카테고리 리스트를 가져오는 provider
 
 @riverpod
 Future<List<ProjectCategory>> fetchHomeCategorys(Ref ref) async {

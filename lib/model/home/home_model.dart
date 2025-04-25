@@ -27,7 +27,6 @@ class HomeItemModel with _$HomeItemModel {
     String? owner,
     int? price,
     String? thumbnail,
-    String? count,
     String? deadline,
     String? description,
     int? waitlistCount,

@@ -1,4 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:convert';
+
+import 'package:fastcampus_wabiz_client/shared/widgets/project_large_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
@@ -72,105 +74,7 @@ class _FavoritePageState extends State<FavoritePage> {
                     itemCount: favorites.projects.length,
                     itemBuilder: (context, index) {
                       final project = favorites.projects[index];
-                      return Container(
-                        margin: EdgeInsets.only(
-                            left: 16, right: 16, top: 20, bottom: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                                offset: Offset(0, 8),
-                                color: Colors.black.withOpacity(.1),
-                                blurRadius: 30,
-                                spreadRadius: 4)
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 190,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: CachedNetworkImageProvider(
-                                        project.thumbnail ?? "")),
-                                color: Colors.amber,
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(10),
-                                    topLeft: Radius.circular(10)),
-                              ),
-                              child: Stack(
-                                children: [
-                                  Positioned(
-                                    top: 8,
-                                    right: 8,
-                                    child: IconButton(
-                                      onPressed: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              content: Text("구독을 취소할까요?"),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () {
-                                                    ref
-                                                        .read(
-                                                            favoriteViewModelProvider
-                                                                .notifier)
-                                                        .removeItem(project);
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: Text("네"),
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      },
-                                      icon: Icon(Icons.favorite),
-                                      color: Colors.red,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("${project.totalFundedCount}명이 기다려요",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 18,
-                                        color: AppColors.primary)),
-                                Gap(8),
-                                Text(
-                                  "${project.title}",
-                                ),
-                                Gap(25),
-                                Text(
-                                  "${project.owner}",
-                                  style: TextStyle(
-                                      color: AppColors.wabizGray[500]!),
-                                ),
-                                Gap(12),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.bg,
-                                    borderRadius: BorderRadius.circular(3),
-                                  ),
-                                  child: Text(project.isOpen == "open"
-                                      ? "바로구매"
-                                      : "오픈 예정"),
-                                )
-                              ],
-                            ).p(16),
-                          ],
-                        ),
-                      );
+                      return ProjectLargeWidget(projectDataString: jsonEncode(project.toJson()),showFavorite: true);
                     },
                   );
                 },
